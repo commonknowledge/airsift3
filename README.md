@@ -15,9 +15,11 @@ Developing this app requires the following tools:
 
 - Git version control system
 - Yarn package manager
-- Docker (or your own Postgres server and configuration details in `.env`)
+- Docker (for running PostGIS database)
 - Python 3.8 (recommended: install using pyenv)
 - Pip package manager
+
+**Note**: The `docker-compose.yml` file only runs a PostGIS database for local development. Django runs directly on your local machine.
 
 First, copy `.env.template` to `.env` in the root.
 
@@ -37,8 +39,8 @@ yarn
 # Copy the .env template into place
 cp .env.template .env
 
-# Provision a postgres database for the app to work with
-docker-compose -f docker-compose.yml up
+# Start the PostGIS database (runs in background)
+docker-compose up -d
 
 # Configure the app's database
 python manage.py migrate
@@ -46,7 +48,7 @@ python manage.py migrate
 # Create an admin user
 python manage.py createsuperuser
 
-# Start the app up
+# Start the Django development server
 python manage.py runserver 0.0.0.0:8000
 ```
 
@@ -63,97 +65,55 @@ When you first set up the application locally or in production, there will be mo
 - Create a `DataStoryIndex` with the slug `datastories`
 - Create an `InfoPage` with the slug `about`
 
-### Server admin
+### Render Deployment
 
-If not already deployed to server, see below section.
+This application is deployed to Render using a simple Docker-based setup.
 
-- To run python commands first enter the environment:
+#### Prerequisites
+- GitHub repository connected to Render
+- Render account
 
-```
-source python/bin/activate
-```
+#### Setup Steps
 
-- To pull in the latest code and migrate the app:
+1. **Create PostgreSQL Database**:
+   - In Render dashboard, create new PostgreSQL instance
+   - Ensure PostGIS extension is enabled (Render PostgreSQL includes this)
+   - Note the internal database URL
 
-```
-git pull origin main
-source python/bin/activate
-python manage.py migrate
-```
+2. **Create Web Service**:
+   - Create new Web Service in Render
+   - Connect to your GitHub repository
+   - Select branch: `main` (or your deployment branch)
+   - Environment: Docker
+   - Build command: (leave empty, uses Dockerfile)
+   - Start command: `./start.sh`
 
-### Deployment info
+3. **Configure Environment Variables**:
+   Required variables:
+   - `DATABASE_URL` - From Render PostgreSQL (internal URL)
+   - `DJANGO_SECRET_KEY` - Generate secure random key
+   - `DJANGO_SETTINGS_MODULE` - Set to `config.settings.production`
+   - `DJANGO_ALLOWED_HOSTS` - Your Render domain
+   - `DJANGO_ADMIN_URL` - Custom admin URL path
+   - `USE_SSL` - Set to `True`
+   - Email settings (MAILGUN_API_KEY, MAILGUN_SENDER_DOMAIN, MAILGUN_API_URL)
 
-- Deployed to a VPS (/var/www/airsift3) via docker-compose using github actions on push to `main`
+4. **Add Persistent Disk for Media Files**:
+   - In Web Service settings, add persistent disk
+   - Mount path: `/app/airsift/media`
+   - Size: 1GB (or as needed)
+   - To restore media files: Upload and untar your backup in the mounted directory
 
-- Compose files:
-  - Production: production.yml
-  - Run production-like setup locally: local.yml
+5. **Deploy**:
+   - Render will automatically build and deploy on git push
+   - Migrations run automatically on startup via `start.sh`
 
-- Expects a .env file in /var/www/airsift3 to contain the server's environment config.
-
-- Expects a regular cron job to run `manage.py sync_data`
-
-- View logs: `docker-compose -f /var/www/airsift3/production.yml logs`
-
-- Adhoc django-admin commands: `docker-compose -f /var/www/airsift3/production.yml run --entrypoint python  -- django manage.py [...]`
-
-#### Install docker if required
-
-See https://docs.docker.com/engine/install/ubuntu/.
-
-#### Install yarn if required
- See https://classic.yarnpkg.com/en/docs/install/#debian-stable or https://www.hostinger.com/tutorials/how-to-install-yarn-on-ubuntu/.
-
-#### App setup
-
-Then... run the following commands to initiate the app on first try:
-
-```shell
-# Optional: prepare a python environment with the right packages
-python3.8 -m venv <virtual env path>
-source <virtual env path>/bin/activate
-
-# Install PRODUCTION python dependencies
-pip install -r requirements/production.txt
-
-# Install frontend dependencies
-yarn
-
-# Configure the app's database
-docker-compose up
-python manage.py migrate
-
-# Create an admin user
-python manage.py createsuperuser
-
-# Pre-run
-python manage.py collectstatic
-
-# Production app up
-gunicorn config.wsgi:application --bind=136.244.105.217:8001 --bind=[::1]:8001
-```
-
-#### Production commands
-
-Env is provided via `.env`.
-
-```
-# Run shell commands on Django
-docker-compose -f /var/www/airsift3/production.yml run --entrypoint python  -- django manage.py shell
-
-# Read the logs
-docker-compose -f /var/www/airsift3/production.yml logs
-
-# Restart the docker
-docker-compose up --force-recreate
-```
-
-#### Troubleshooting
-
-If you see errors relating to `GDAL` missing:
-
-- try `sudo apt-get install gdal-bin`
-- and also see `https://www.vultr.com/docs/install-the-postgis-extension-for-postgresql-on-ubuntu-linux` to configure postgres to use postGIS extensions.
+#### Notes
+- Static files are served via WhiteNoise (already configured)
+- Media files are stored on Render persistent disk
+- For better scalability, consider migrating media files to S3/cloud storage
+- Database backups managed through Render PostgreSQL dashboard
+- A regular cron job or scheduled task should run `manage.py sync_data` if needed
 
 ### Settings
 
