@@ -5,5 +5,3 @@
 !.babelrc
 node_modules
 Dockerfile
-/local.yml
-/production.yml
