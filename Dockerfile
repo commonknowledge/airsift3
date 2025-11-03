@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM python:3.8-slim-bullseye
 
 ENV PYTHONUNBUFFERED 1
 
@@ -12,13 +12,12 @@ RUN apt-get update \
   # Translations dependencies
   && apt-get install -y gettext \
   # Build dependencies
-  && apt-get install -y curl \
-  && curl -sL https://deb.nodesource.com/setup_12.x -o ~/nodesource_setup.sh \
-  && bash ~/nodesource_setup.sh \
-  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+  && apt-get install -y curl gnupg \
+  && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o /usr/share/keyrings/yarn-archive-keyring.gpg \
+  && echo "deb [signed-by=/usr/share/keyrings/yarn-archive-keyring.gpg] https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
   && apt-get update \
-  && apt-get install -y nodejs yarn  \
+  && apt-get install -y nodejs yarn \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
