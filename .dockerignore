@@ -1,27 +1,16 @@
-# Git files
+# Git
 .git
 .gitignore
-.gitattributes
 
 # Python cache
 __pycache__
 *.py[cod]
-*$py.class
 *.so
-.Python
 
-# Virtual environments
+# Virtual environments  
 venv/
 env/
-ENV/
 .venv
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
 
 # Node
 node_modules/
@@ -33,34 +22,15 @@ build/
 
 # OS files
 .DS_Store
-Thumbs.db
 
-# Docker
-Dockerfile
-docker-compose.yml
-.dockerignore
-compose/
-local.yml
-production.yml
-
-# Local env files (keep template)
-.env
-.env.local
-
-# Keep these
-!.coveragerc
-!.pylintrc
-!.babelrc
-
-# Documentation
-docs/
-*.md
-!README.md
-
-# Tests
+# Tests & coverage
 .coverage
 htmlcov/
 .pytest_cache/
 
 # Logs
 *.log
+
+# Local development only
+docker-compose.yml
+.env
