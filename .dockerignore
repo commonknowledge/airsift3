@@ -39,6 +39,9 @@ Thumbs.db
 Dockerfile
 docker-compose.yml
 .dockerignore
+compose/
+local.yml
+production.yml
 
 # Local env files (keep template)
 .env
