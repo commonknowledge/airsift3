@@ -41,5 +41,6 @@ RUN cd /app && yarn build && rm -rf node_modules
 
 WORKDIR /app
 
-EXPOSE 5000
+# Expose default port (Render will use PORT env var)
+EXPOSE 10000
 
