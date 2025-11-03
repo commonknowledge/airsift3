@@ -13,7 +13,7 @@ RUN apt-get update \
   && apt-get install -y gettext \
   # Build dependencies
   && apt-get install -y curl gnupg \
-  && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+  && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
   && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o /usr/share/keyrings/yarn-archive-keyring.gpg \
   && echo "deb [signed-by=/usr/share/keyrings/yarn-archive-keyring.gpg] https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
   && apt-get update \
@@ -37,8 +37,7 @@ RUN cd /app && yarn
 COPY . /app
 
 # Build frontend assets and remove node_modules to reduce image size
-# Use legacy OpenSSL provider for Node.js 18 compatibility with Webpack 4
-RUN cd /app && NODE_OPTIONS=--openssl-legacy-provider yarn build && rm -rf node_modules
+RUN cd /app && yarn build && rm -rf node_modules
 
 WORKDIR /app
 
