@@ -1,7 +1,63 @@
-.*
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Python cache
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node
+node_modules/
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Local env files (keep template)
+.env
+.env.local
+
+# Keep these
 !.coveragerc
-!.env
 !.pylintrc
 !.babelrc
-node_modules
-Dockerfile
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Tests
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Logs
+*.log
