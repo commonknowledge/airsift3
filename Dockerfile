@@ -44,3 +44,6 @@ WORKDIR /app
 # Expose default port (Render will use PORT env var)
 EXPOSE 10000
 
+# Run the start script
+CMD ["/app/start.sh"]
+
