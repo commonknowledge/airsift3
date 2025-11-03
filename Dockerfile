@@ -37,7 +37,8 @@ RUN cd /app && yarn
 COPY . /app
 
 # Build frontend assets and remove node_modules to reduce image size
-RUN cd /app && yarn build && rm -rf node_modules
+# Use legacy OpenSSL provider for Node.js 18 compatibility with Webpack 4
+RUN cd /app && NODE_OPTIONS=--openssl-legacy-provider yarn build && rm -rf node_modules
 
 WORKDIR /app
 
