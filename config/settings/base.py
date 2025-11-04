@@ -44,10 +44,14 @@ LOCALE_PATHS = [str(ROOT_DIR / "locale")]
 
 POSTGRES_USER = env.str("POSTGRES_USER", default="postgres")
 POSTGRES_PASSWORD = env.str("POSTGRES_PASSWORD", default="postgres")
-POSTGRES_HOST = env.str("POSTGRES_HOST", default="localhost")
+POSTGRES_HOST = env.str("POSTGRES_HOST", default="postgres")
 POSTGRES_DB = env.str("POSTGRES_DB", default="postgres")
 POSTGRES_PORT = env.int("POSTGRES_PORT", default=5432)
 DATABASE_OBJ = env.db("DATABASE_URL", default=f"postgis://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}")
+
+# Site URL for admin email links - required by wagtail (https://github.com/wagtail/wagtail/issues/3248)
+BASE_URL = env.str('BASE_URL', default='localhost')
+
 DATABASES = {
     "default": DATABASE_OBJ
 }
@@ -337,6 +341,6 @@ WEBPACK_LOADER = {
     }
 }
 
-WAGTAILAPI_LIMIT_MAX = None
+WAGTAILAPI_LIMIT_MAX = 1000
 
 CITIZENSENSE_DATA_API = 'https://citizensense.co.uk:7000'

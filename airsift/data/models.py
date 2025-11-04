@@ -30,6 +30,10 @@ class Dustbox(models.Model):
     title = models.CharField(max_length=256)
     updated_at = models.DateTimeField(null=True)
 
+    @property
+    def url(self, *args, **kwargs):
+        return f'/dustboxes/inspect/{self.id}'
+
     api_fields = [
         APIField('id'),
         APIField('created_at'),
@@ -99,6 +103,15 @@ class DustboxPage(TweakedSeoMixin, Page):
         "map_image",
     ]
 
+    def relative_url(self, *args, **kwargs):
+        return f'/dustboxes/inspect/{self.slug}'
+
+    def get_url(self, *args, **kwargs):
+        return f'/dustboxes/inspect/{self.slug}'
+
+    # Editor
+    parent_page_types = ['dustboxes.InteractiveMapPage']
+    subpage_types = []
     promote_panels = SeoMixin.seo_panels
     content_panels = Page.content_panels + [
         ImageChooserPanel('map_image'),

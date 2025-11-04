@@ -24,6 +24,7 @@ class DataStoryIndex(TweakedSeoMixin, Page):
     ]
 
     # Editor
+    parent_page_types = ['home.HomePage']
     show_in_menus_default = True
     promote_panels = SeoMixin.seo_panels
 
@@ -50,6 +51,12 @@ class DataStoryIndex(TweakedSeoMixin, Page):
                     return strip_tags(text)
         return ""
 
+    def get_context(self, request, *args, **kwargs):
+        ctx = super().get_context(request, *args, **kwargs)
+        return {
+            **ctx,
+            'datastory_objects': list(DataStory.objects.live().public().all())
+        }
 
 class DataStory(TweakedSeoMixin, Page):
     class Meta:
@@ -87,6 +94,8 @@ class DataStory(TweakedSeoMixin, Page):
         return ""
 
     # Editor
+    parent_page_types = ['DataStoryIndex', 'users.UserIndexPage']
+    subpage_types = []
     show_in_menus_default = True
 
     # Copy
@@ -124,7 +133,7 @@ class DataStory(TweakedSeoMixin, Page):
     )
     landuse_options = MultipleChoiceModel(
         choices=landuse_choices,
-        verbose_name='Are there any plans to change the use of the land in the future? (select multiple)'
+        verbose_name='How is the land currently being used? (select multiple)'
     )
 
     landuse_description = RichTextField(
@@ -133,7 +142,7 @@ class DataStory(TweakedSeoMixin, Page):
         features=['bold', 'italic', 'link', 'ol', 'ul', 'image', 'blockquote']
     )
 
-    # * Are there any plans to change the use of the land in the future? (select multiple) <br>
+    # * Are there any plans to change land use in the future? (select multiple) <br>
     landuse_changes_planned_choices = create_choices(
         'Residential developments',
         'Industrial developments',
@@ -142,7 +151,7 @@ class DataStory(TweakedSeoMixin, Page):
     )
     landuse_changes_planned_options = MultipleChoiceModel(
         choices=landuse_changes_planned_choices,
-        verbose_name='Are there any plans to change the use of the land in the future? (select multiple)'
+        verbose_name='Are there any plans to change the land use in the future? (select multiple)'
     )
 
     # Green space
@@ -193,7 +202,7 @@ class DataStory(TweakedSeoMixin, Page):
     )
 
     # Local sources of particle pollution
-    # Look at the area on the Airsift map. Here, add any possible sources of pollution. This will relate to the land use mentioned above, and might include transport, waste, industry as appropriate for the area. Include a snapshot of this map in your data story.
+    # Look at the area on the Airsift map. In the section below, describe land use in the area and list possible sources of local and regional pollution. This might include transport, waste, industry, agriculture, construction, residential areas or greenspace. Identify whether there are Dustboxes and other monitors in the area. Include a map in your data story.
 
     # How might these sources impact local air-quality and what are the specific sources? [medium free text]
     impacting_sources_of_pollution_description = RichTextField(
@@ -217,7 +226,7 @@ class DataStory(TweakedSeoMixin, Page):
     )
     dustbox_location_options = MultipleChoiceModel(
         choices=dustbox_location_choices,
-        verbose_name='What kinds of public green space are in the area?'
+        verbose_name='Where are these dustboxes placed?'
     )
 
     # * Are there other citizen or regulatory monitors in your area? [Y/N]
@@ -249,12 +258,11 @@ class DataStory(TweakedSeoMixin, Page):
     )
 
     # **Observations**
-    # In this section, note any key observations from the monitoring period (and before). Observations can be used to help you understand some context behind the Dustbox data. The time and location of these events are important factors to note as they can help you identify possible sources of pollution. You can map observations on the Airsift platform [link] and view the observations from other contributors. It is also useful to meet as a group and discuss your shared observations as other observations and experiences may become apparent.
-    # Observations might include unpleasant smells, sources of noise and visible sources of pollution such as smog, smoke and dust. It could also relate to visible activity such as construction work. Some residents might note the health effects of pollution. You could find news reports of fires, pollution warnings and other media that can help explain peaks in the data.
+    # In this section, note any key observations from the monitoring period (and before). Observations might include unpleasant smells, sources of noise and visible sources of pollution such as smog, smoke and dust. It could also relate to visible activity such as construction work. Some residents might note the health effects of pollution. You could find news reports of fires, pollution warnings and other media that can help explain peaks in the data.
 
-    # Community Discussion
-    # * Did your community identify any observations based on your discussions? [Y/N]
-    # * Did your community identify any observations based on your discussions? [long text field].
+    # You can map observations on the [Airsift platform](https://airsift.citizensense.net/observations/) and view the observations from other contributors.
+
+
     community_observations = RichTextField(
         blank=True, null=True,
         features=['bold', 'italic', 'link', 'ol', 'ul', 'image', 'blockquote'],
@@ -319,23 +327,26 @@ class DataStory(TweakedSeoMixin, Page):
         HelpPanel(markdown('''
 # What is a Data Story?
 
-Data Stories draw together different kinds of evidence to narrate the impact that air pollution is having in your area. You can group together multiple forms of evidence that might include citizen data, regulatory data, weather data, local observations and other kinds of visual and auditory media. Monitoring studies normally start from a series of questions that you want to ask about your local air quality. For more guidance on this, please refer to the AirKit Logbook [link to section]. You may have also identified different sources of data to identify possible sources of pollution and develop actions for improving local air quality. This guide will assist you in writing a Data Story on Airsift.
+Data Stories draw together different kinds of evidence to narrate the impact that air pollution is having in your area. This guide will assist you in writing a Data Story on Airsift. You can group together multiple forms of evidence that could include citizen data, regulatory data, weather data, local observations, maps and other kinds of visual and auditory media. Monitoring studies normally start from a series of questions that you want to ask about your local air quality. For more guidance on setting up an air quality study, please refer to the [AirKit Logbook](https://github.com/citizensense/AirKit_Logbook/blob/main/README.md).
 
 # Writing Your Data Story
 
-Writing a Data Story is a detailed and collaborative process that will likely require several iterations and revisions. The instructions below can act as a guideline to help you structure and complete a Data Story based on citizen data. You can see this structure in action by browsing these [link] published Data Stories. It can be helpful to include images of your local area in the data story to illustrate the landscape, highlight visible pollution and activity, or demonstrate how and where sensors are installed.
+Writing a Data Story is a detailed and collaborative process that will likely require several iterations and revisions. The instructions below can act as a guideline to help you structure and complete a Data Story using citizen data and other forms of evidence. You can see this structure in action by browsing our [Covid Data Stories](https://datastories-covid.citizensense.net/). It can be helpful to include images of your local area in the data story to illustrate the landscape, highlight possible pollution sources, and demonstrate how and where sensors are installed.
 
-1. Select a title for your story, keeping it simple, short and descriptive.
-2. Click the sections below and follow the instructions to fill out the story.
-3. Using the tool-bar you can add simple formatting to text (i.e. bold, italics etc.), add links to other media, and insert images and tables.
-4. You can upload images from your computer or copy and paste plots from Analytics.
-5. You can save your progress by selecting 'save draft', in the menu next to the 'publish'
-6. You can [view and read published data stories here](/datastories)
+1. Create an account by clicking "Sign In" and following the instructions to register.
+2. Navigate to "Stories" in the top right-hand menu, and click "+Add a Data Story."
+3. Create a title for your story, keeping it simple, short and descriptive.
+4. Click the sections below numbered 0 to 5 and follow the instructions to write your story. You can follow these instructions as closely or freely as suits your study.
+5. Use the toolbar to add simple formatting to your text (i.e., bold, italics etc.), add links to other media, and insert images and tables.
+6. Upload images from your computer, or copy and paste plots from [Airsift Analysis](https://airsift.citizensense.net/analysis/).
+7. Save your progress by selecting "Save Draft," on the bottom menu marked "Publish."
+8. When you are ready to publish your Data Story, click "Publish." The story will be sent for moderation before publication.
+9. You can [view and read published data stories here](/datastories)
         '''), classname='markdown'),
         MultiFieldPanel(
             [
                 HelpPanel(markdown('''
-At the start of the data story, it is useful to give a summary of the key findings and the data used in your Data Story. This section should be short at around 1–2 paragraphs.
+At the start of the data story, it is useful to give a summary of the key findings and the data used in your Data Story. This section should be short, or around 1–2 paragraphs.
                 '''), classname='markdown help-compact'),
                 ImageChooserPanel('feature_image'),
                 FieldRowPanel([
@@ -353,44 +364,6 @@ At the start of the data story, it is useful to give a summary of the key findin
 In the early stages of your project, you will have considered the local area and possible pollution sources. Begin this section by offering some context and background on the area that you are monitoring.
                 '''), classname='help-compact markdown'),
                 FieldPanel('location_name'),
-
-                HelpPanel(markdown('''
-# Land Use
-                '''), classname='help-compact markdown'),
-                # Land use
-                FieldPanel(
-                    'landuse_options',
-                    widget=forms.CheckboxSelectMultiple(choices=landuse_choices)
-                ),
-                FieldPanel('landuse_description'),
-                FieldPanel(
-                    'landuse_changes_planned_options',
-                    widget=forms.CheckboxSelectMultiple(choices=landuse_changes_planned_choices)
-                ),
-
-                # Green space
-                HelpPanel(markdown('''
-# Green Space
-                '''), classname='help-compact markdown'),
-                FieldPanel(
-                    'green_spaces_options',
-                    widget=forms.CheckboxSelectMultiple(choices=green_spaces_choices)
-                ),
-                FieldPanel('green_space_description'),
-
-                # Antrho
-                HelpPanel(markdown('''
-# Anthropogenic Activity
-
-Note the kinds of human activity that take place on the land.
-                '''), classname='help-compact'),
-                FieldPanel('industrial_activity', widget=forms.CheckboxInput),
-                FieldPanel('industrial_activity_description'),
-                FieldPanel('waste_disposal', widget=forms.CheckboxInput),
-                FieldPanel('waste_disposal_description'),
-                FieldPanel('agriculture', widget=forms.CheckboxInput),
-                FieldPanel('agriculture_description'),
-
                 HelpPanel(markdown('''
 # Local sources of particle pollution
 
@@ -407,17 +380,14 @@ Identify possible pollution sources including but not limited to:
 - Sites of potential burning activity such as allotments.
 - Factories and other industrial activity.
 - Biogenic or geological sources of pollution (such as volcanoes, deserts, wildfires).
-
-How might these sources impact local air-quality and what are the specific sources?
                 '''), classname='help-compact markdown'),
-                FieldPanel('impacting_sources_of_pollution_description'),
 
+                AutocompletePanel(
+                    'related_dustboxes'
+                ),
                 FieldPanel(
                     'dustbox_location_options',
                     widget=forms.CheckboxSelectMultiple(choices=dustbox_location_choices)
-                ),
-                AutocompletePanel(
-                    'related_dustboxes'
                 ),
 
                 # R
@@ -426,26 +396,18 @@ How might these sources impact local air-quality and what are the specific sourc
 
 In this section, describe regional pollution sources for your area. Regional sources can be identified by looking at local pollution reporting mechanisms.
                 '''), classname='help-compact markdown'),
-                FieldPanel(
-                    'regional_pollution_options',
-                    widget=forms.CheckboxSelectMultiple(choices=regional_pollution_choices)
-                ),
                 FieldPanel('regional_pollution_sources_description',),
 
                 # O
                 HelpPanel(markdown('''
 # Observations
+In this section, note any key observations from the monitoring period (and before). Observations might include unpleasant smells, sources of noise and visible sources of pollution such as smog, smoke and dust. It could also relate to visible activity such as construction work. Some residents might note the health effects of pollution. You could find news reports of fires, pollution warnings and other media that can help explain peaks in the data.
 
-In this section, note any key observations from the monitoring period (and before). Observations can be used to help you understand some context behind the Dustbox data. The time and location of these events are important factors to note as they can help you identify possible sources of pollution. You can map observations on the Airsift platform [link] and view the observations from other contributors. It is also useful to meet as a group and discuss your shared observations as other observations and experiences may become apparent.
-
-Observations might include unpleasant smells, sources of noise and visible sources of pollution such as smog, smoke and dust. It could also relate to visible activity such as construction work. Some residents might note the health effects of pollution. You could find news reports of fires, pollution warnings and other media that can help explain peaks in the data.
+You can map observations on the [Airsift platform](https://airsift.citizensense.net/observations/) and view the observations from other contributors.
 
 ## Community Discussion
                 '''), classname='help-compact markdown'),
-                FieldPanel('community_observations'),
-                HelpPanel(markdown('''
-## From Airsift
-                '''), classname='help-compact markdown'),
+
                 AutocompletePanel('related_observations'),
 
                 # Other
@@ -460,23 +422,22 @@ Observations might include unpleasant smells, sources of noise and visible sourc
         MultiFieldPanel(
             [
                 HelpPanel(markdown('''
-This section can be adapted from existing story text to fit the context of your monitoring study. This includes a paragraph that explains what is meant by the Dustbox 2.0 device being an "indicative" monitor.
+This section can be adapted from to fit the context of your monitoring study. You can include an explanation that by the Dustbox 2.0 are similar devices are an "indicative" monitor, rather than regulatory station.
 
-Here you should note any co-location activity of the monitors (before, after or ideally both) and the findings of this.
+Here you can note whether you co-located monitors (before, after or ideally both), and your findings.
 
-Note that whilst the World Health Organisation has established guidelines on PM2.5 exposure there is not safe level.
+Note that while the World Health Organisation has established outdoor air quality guidelines for PM2.5, there is no safe level of exposure.
 
 ## How to establish evidence of elevated pollution
 
 To establish whether there is evidence of elevated pollution in your area, you can follow these steps:
 
-* Create a **line plot** for each Dustbox in your area for the monitoring period with 24 h mean.
+* Create a [line plot](https://airsift.citizensense.net/analysis/) for each Dustbox in your study area, selecting the monitoring period and mean.
 * Review the peaks and baseline of the data.
 * Are the World Health Organisation or local air-quality guidelines regularly breached?
-* Is there any other data/information from your local authority or other monitoring projects that support this finding?
-* You can also compare the data you have collected to other monitors for this period.
-* If there are ambient monitors (those away from the roadside), you can compare and see if peaks are caused by local or regional sources of pollution.
-* If pollution is local you will see a spike in your monitor where the ambient monitor is flat. If it is regional you will see similar peaks and troughs in both monitors.
+* You can also compare the data you have collected to other monitors for this period, to see if other monitoring projects support your findings.
+* You can compare different monitors--including background and roadside--to see if peaks are caused by local or regional sources of pollution.
+* If pollution is local to your monitor, you will likely see a spike in your data in comparison to the background monitor. If pollution is regional, you will likely see similar peaks and troughs in comparison datasets.
                 '''), classname='markdown help-compact'),
                 FieldPanel('evidenceofproblem_copy', classname="full"),
             ],
@@ -491,33 +452,14 @@ In this section you can use Airsift to identify the times of day and weather con
 ## When is the source most evident?
 **Time plots** can be used to analyze the times when pollution levels are most frequently elevated. Time plots aggregate PM2.5 concentrations according to time to indicate:
 
-* Key patterns such as rush hours and traffic.
+* Key patterns such as rush hour and traffic.
 * Possible construction or industry sources.
 * Regional pollution events due to seasonal variation
 
-Create a plot for each of the Dustboxes in your monitoring study. Look for peaks across weekdays and weekends. If traffic is a source of pollution, you would expect to see peaks at times of increased congestion i.e. the morning and evening rush hour.
+Create a plot for each of the Dustboxes in your monitoring study. Look for peaks across weekdays and weekends. If traffic is a source of pollution, you would expect to see peaks at times of increased congestion, i.e., the morning and evening rush hour.
 
-When you look at each plot consider how the Dustbox installation could impact the data. Dustboxes that are close to the roadside will often see higher peaks at rush hour. Those in the garden might show peaks at different times, for example barbecues on Sunday afternoons.
+When you look at each plot consider how the Dustbox installation could impact the data. Dustboxes that are close to the roadside will often register higher peaks at rush hour. Monitors located in background locations such as gardens might show peaks at different times, for example barbecues on Sunday afternoons.
 
-## Which direction is PM2.5 coming from?
-
-**Scatter Plots of PM2.5 Concentrations and Wind Direction** can be used to gauge the location of emissions sources in relation to the Dustbox monitors. Particulate matter is carried by the wind from emissions sources to the monitoring area. Wind direction is given in degrees where 0 (o) is North and 180 (o) is South. Note the directions where the highest levels of pollution are recorded.
-
-**Polar plots** can also illustrate this relationship. Colour contours reflect pollutant concentrations in relation to wind direction and wind speed. Calm conditions (zero wind) are shown in the centre, increasing up to 20 metres per second (ms-1) at the outer ring. The highest mean concentrations are shown in red, the lowest are in blue, in a dynamic scale.
-
-* Look for patterns in the polar plots, are they similar across the different monitors?
-* Where are the highest levels of pollutants coming from?
-* Look at the satellite map and see if you can see any possible sources of these emissions.
-
-## Under which weather conditions are PM2.5 levels most evident?
-
-**Scatter Plots of PM2.5 Concentrations and Wind Speed** can be used to understand the relationship between wind speed and PM2.5 to identify if elevated levels are present at low winds, thereby indicating possible local emission source(s).
-
-**Scatter Plots of PM2.5 Concentrations and Temperature** can be used to check if there is a positive or negative correlation between temperature and PM2.5. This can help in understanding the seasonal variation of PM2.5 with respect to temperature.
-
-**Scatter Plots of PM2.5 Concentrations and Humidity** can be used to illustrate the relationship between PM2.5 and humidity. During high humidity, there would be fewer occurrences of wind-blown dust.
-
-## Write up
                 '''), classname='markdown help-compact'),
                 FieldPanel('characterofproblem_copy', classname="full"),
             ],
@@ -527,7 +469,7 @@ When you look at each plot consider how the Dustbox installation could impact th
         MultiFieldPanel(
             [
                 HelpPanel(markdown('''
-This section brings together a bullet point list that summarises all the evidence presented throughout the previous sections.
+This section brings together a summary of all the evidence presented in the previous sections.
 
 * Summarise the sources of data that have been used in the study.
 * Draw out the key findings of your analysis and observations to identify key sources of pollution.
@@ -541,13 +483,11 @@ This section brings together a bullet point list that summarises all the evidenc
         MultiFieldPanel(
             [
                 HelpPanel(markdown('''
-Actions are recommendations for things that can be done to improve local air-quality and to mitigate the effects of pollution. The process of developing actions should be in dialogue with your community and through engagement with local policy and planning around infrastructure, development and industry. Consider what the main sources of pollution are and what kinds of actions would help improve air quality. It is likely that actions relating to a combination of these would improve your local air quality. This could be related to: traffic and transport; construction and development; green infrastructure; air quality monitoring; waste management; industry and/or agriculture.
-
-For each source of pollution or intervention, investigate local policy and planning. Here you should consider ways in which existing policies or plans could be extended to improve air quality. For example:
+Actions are recommendations for things that can be done to improve local air-quality and to mitigate the effects of pollution. The process of developing actions should be in dialogue with your community and through engagement with local policy and planning around infrastructure, development and industry. Consider what the main sources of pollution are and what kinds of actions would help improve air quality. This could be related to: traffic and transport; construction and development; green infrastructure; air quality monitoring; waste management; industry and/or agriculture. Example actions could include:
 
 * The local council may have plans to improve cycling infrastructure. The findings of your data story might highlight the need to extend this to a wider area.
 * Your monitoring might identify an area where a green screen could notably improve air quality at a key community site.
-* Your study might determine a potential source of pollution that requires further and more focussed monitoring.
+* Your study might determine a potential source of pollution that requires further and more focused monitoring.
 '''), classname='markdown help-compact'),
                 FieldPanel('actions_copy', classname="full"),
             ],
