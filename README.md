@@ -220,7 +220,6 @@ If you see errors relating to `GDAL` missing:
 
 - try `sudo apt-get install gdal-bin`
 - and also see `https://www.vultr.com/docs/install-the-postgis-extension-for-postgresql-on-ubuntu-linux` to configure postgres to use postGIS extensions.
->>>>>>> upstream/main
 
 ### Settings
 
