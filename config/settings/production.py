@@ -63,12 +63,9 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
     "DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", default=True
 )
 
-# STATIC & MEDIA
+# STATIC
 # ------------------------
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-# Use custom WhiteNoise middleware to serve both static and media files
-MIDDLEWARE[1] = "config.whitenoise_media.WhiteNoiseMediaMiddleware"  # noqa F405
 
 # MEDIA
 # ------------------------------------------------------------------------------
