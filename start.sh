@@ -9,8 +9,12 @@ echo "Starting deployment..."
 echo "Running collectstatic..."
 python /app/manage.py collectstatic --noinput
 
-echo "Running migrations..."
-python /app/manage.py migrate
+if [ "${SKIP_MIGRATIONS:-0}" = "1" ]; then
+  echo "⚠️  Skipping migrations (SKIP_MIGRATIONS=1)"
+else
+  echo "Running migrations..."
+  python /app/manage.py migrate --noinput
+fi
 
 echo "Starting gunicorn on port ${PORT:-5000}..."
 # Use PORT environment variable provided by Render, fallback to 5000 for local development
