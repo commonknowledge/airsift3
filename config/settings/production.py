@@ -161,6 +161,12 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
+        # Enable database query logging for diagnostics
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
     },
 }
 
