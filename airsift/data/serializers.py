@@ -4,10 +4,8 @@ from rest_framework import serializers
 from airsift.data import models
 
 class DustboxSerializer(serializers.ModelSerializer):
-    has_data = serializers.SerializerMethodField('has_data_fn')
-
-    def has_data_fn(self, instance):
-        return models.DustboxReading.objects.filter(dustbox=instance).exists()
+    has_data = serializers.BooleanField(read_only=True)
+    
     class Meta:
         model = models.Dustbox
         fields = '__all__'
