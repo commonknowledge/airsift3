@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import pagination, generics, filters
 from django_filters import rest_framework as django_filters
 from airsift.data import models, serializers
-from django.db.models import Avg
+from django.db.models import Avg, Exists, OuterRef
 from airsift.datastories.forms import create_choices
 class ItemSetPagination(pagination.LimitOffsetPagination):
      default_limit = 1
@@ -21,8 +21,16 @@ class ItemSetFiltering(django_filters.FilterSet):
         ]
 
 class DustboxesViewSet(ReadOnlyModelViewSet):
-    queryset = models.Dustbox.objects.all()
     serializer_class = serializers.DustboxSerializer
+    
+    def get_queryset(self):
+        # Annotate with has_data using a single efficient subquery
+        # This prevents N+1 query problem by computing has_data in a single database query
+        return models.Dustbox.objects.annotate(
+            has_data=Exists(
+                models.DustboxReading.objects.filter(dustbox=OuterRef('pk'))
+            )
+        )
 
 class DustboxesReadingsViewSet(ReadOnlyModelViewSet):
     queryset = models.DustboxReading.objects.all()
