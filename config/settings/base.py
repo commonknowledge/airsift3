@@ -352,8 +352,10 @@ CITIZENSENSE_DATA_API = 'https://citizensense.co.uk:7000'
 FREEZE_ROOT = str(ROOT_DIR / "frozen_site")
 
 # Site URL to crawl - uses HTTPS in production, HTTP in development
+# Strip any protocol from BASE_URL to avoid double-protocol issues
+_freeze_base = BASE_URL.replace('https://', '').replace('http://', '').rstrip('/')
 _freeze_protocol = 'http' if DEBUG else 'https'
-FREEZE_SITE_URL = env.str('FREEZE_SITE_URL', default=f'{_freeze_protocol}://{BASE_URL}')
+FREEZE_SITE_URL = env.str('FREEZE_SITE_URL', default=f'{_freeze_protocol}://{_freeze_base}')
 
 # Convert absolute URLs to relative for portability
 FREEZE_RELATIVE_URLS = True
