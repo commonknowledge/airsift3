@@ -23,7 +23,6 @@ These environment variables **must be set** in your Render service for the appli
 
 ## Optional Variables (with defaults)
 
-- `FREEZE_SITE_URL` - Full URL for static site generation (defaults to `https://{BASE_URL}` in production)
 - `DJANGO_SECURE_SSL_REDIRECT=True` - Redirect HTTP to HTTPS
 - `DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS=True`
 - `DJANGO_SECURE_HSTS_PRELOAD=True`

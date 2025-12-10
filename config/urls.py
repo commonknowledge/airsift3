@@ -18,8 +18,6 @@ from .views import capture_login, capture_logout
 from .media_serve import serve_media
 
 urlpatterns = [
-    # Static site generation (staff only)
-    path('freeze/', include('freeze.urls')),
     # API urls
     path('api/v2/', api_router.urls),
     path('api/v2/', include('data.urls')),

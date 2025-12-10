@@ -106,7 +106,6 @@ THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework_gis',
     'django_filters',
-    'freeze',
 ]
 
 LOCAL_APPS = [
@@ -345,21 +344,3 @@ WEBPACK_LOADER = {
 WAGTAILAPI_LIMIT_MAX = 1000
 
 CITIZENSENSE_DATA_API = 'https://citizensense.co.uk:7000'
-
-# django-freeze
-# ------------------------------------------------------------------------------
-# Output directory for the static site
-FREEZE_ROOT = str(ROOT_DIR / "frozen_site")
-
-# Site URL to crawl - uses HTTPS in production, HTTP in development
-# Strip any protocol from BASE_URL to avoid double-protocol issues
-_freeze_base = BASE_URL.replace('https://', '').replace('http://', '').rstrip('/')
-_freeze_protocol = 'http' if DEBUG else 'https'
-FREEZE_SITE_URL = env.str('FREEZE_SITE_URL', default=f'{_freeze_protocol}://{_freeze_base}')
-
-# Convert absolute URLs to relative for portability
-FREEZE_RELATIVE_URLS = True
-
-# Include media and static files in the frozen output
-FREEZE_INCLUDE_MEDIA = True
-FREEZE_INCLUDE_STATIC = True
